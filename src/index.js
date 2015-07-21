@@ -1,4 +1,4 @@
-var EventEmitter = require('events')
+var EventEmitter = require('events').EventEmitter
 var http = require('http')
 var url = require('url')
 
