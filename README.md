@@ -7,3 +7,41 @@
 [![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat)](https://github.com/feross/standard)
 
 [![NPM](https://nodei.co/npm/http-request-timings.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/http-request-timings/)
+
+This module monkey-patches the `http.request` method – which is used internally by `http.get`, `https.request`, `https.get` and therefor any library like `request` – to record timings.
+
+```bash
+npm install -S http-request-timings
+```
+
+```js
+var http = require('http')
+
+var timings = require('http-request-timings')
+
+// monkey-patch http.request
+timings.start()
+
+timings.on('timing', function (timing, options, res) {
+  timing.start // Date
+  timing.firstByte // Date
+  timing.end // Date
+
+  timing.timeToFirstByte // duration in ms
+  timing.timeToEnd // duration in ms
+
+  // options passed to http.request
+  // if it was originally a string then it's `url.parse`d
+  options
+
+  // the response
+  res
+})
+
+http.get('http://example.com/', function (res) {
+  // …
+
+  // go back to default http.request
+  timings.stop()
+})
+```
