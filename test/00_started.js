@@ -18,11 +18,21 @@ function roughly (number) {
   return Math.round(number / 100) * 100
 }
 
+function handleResponse (t, res) {
+  t.ok(res instanceof http.IncomingMessage)
+
+  var body = ''
+  res.on('data', function (chunk) {
+    body += String(chunk)
+  })
+
+  res.on('end', function () {
+    t.is(body, 'YO!')
+  })
+}
+
 test('emits timings via http when started', function (t) {
-  t.plan(
-    (5/* number of requests */ * 7 /* number of tests per timing */) +
-    3 // number of tests in callbacks
-  )
+  t.plan(4/* number of requests */ * 9 /* number of tests per timing */)
 
   timings.on('timing', function (timing, options, res) {
     t.ok(timing.start instanceof Date)
@@ -41,15 +51,10 @@ test('emits timings via http when started', function (t) {
     hostname: 'example.com',
     port: 80,
     path: '/'
-  })
-
-  // Works with http.get and string
-  http.get('http://example.com/')
+  }, handleResponse.bind(null, t))
 
   // Works with http.get and string and callback
-  http.get('http://example.com/', function (res) {
-    t.ok(res instanceof http.IncomingMessage)
-  })
+  http.get('http://example.com/', handleResponse.bind(null, t))
 
   // Works with http.request and object
   http.request({
@@ -57,11 +62,11 @@ test('emits timings via http when started', function (t) {
     port: 80,
     method: 'GET',
     path: '/'
-  }).end()
+  }, handleResponse.bind(null, t)).end()
 
   // Works when wrapped with request
-  request('http://example.com', function (err, res, body) {
-    t.error(err)
+  request('http://example.com', function (er, res, body) {
     t.ok(res instanceof http.IncomingMessage)
+    t.is(body, 'YO!')
   })
 })

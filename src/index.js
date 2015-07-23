@@ -19,12 +19,11 @@ function wrapper (original, options, callback) {
     start: new Date()
   }
 
-  function noop () {}
   function wrappedCallback (res) {
     timing.firstByte = new Date()
     timing.timeToFirstByte = timing.firstByte - timing.start
+    timings.emit('first-byte', timing, options, res)
 
-    res.on('data', noop)
     res.on('end', function emitTiming () {
       if (typeof options === 'string') options = url.parse(options)
 
@@ -33,7 +32,6 @@ function wrapper (original, options, callback) {
 
       timings.emit('timing', timing, options, res)
       res.removeListener('end', emitTiming)
-      res.removeListener('data', noop)
     })
 
     if (typeof callback === 'function') callback.apply(null, arguments)

@@ -42,6 +42,7 @@ timings.on('timing', function (timing, options, res) {
 
 http.get('http://example.com/', function (res) {
   // …
+  res.on('data', doStuff)
 
   // go back to default http.request
   timings.stop()
