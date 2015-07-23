@@ -19,3 +19,6 @@ after_success:
 - python travis_after_all.py
 - export $(cat .to_export_back)
 - npm run semantic-release
+matrix:
+  allow_failures:
+    - node_js: '0.10'

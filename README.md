@@ -10,6 +10,8 @@
 
 This module monkey-patches the `http.request` method – which is used internally by `http.get`, `https.request`, `https.get` and therefor any library like `request` – to record timings.
 
+_Note:_ The core `https` module isn't patched on node <=0.10. This will be addressed in a future version.
+
 ```bash
 npm install -S http-request-timings
 ```
